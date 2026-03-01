@@ -1,0 +1,227 @@
+import type { DataPoint, Settings, Metrics } from '../types';
+import type { PlaybackState } from '../hooks/usePlayback';
+import FlowDiagram from './FlowDiagram';
+import Notifications from './Notifications';
+import { formatTime } from '../calculations';
+import { SkipBack, Play, Pause, SkipForward, Radio, AlertTriangle, Check, X } from 'lucide-react';
+
+interface Props {
+  currentPoint: DataPoint | undefined;
+  metrics: Metrics;
+  settings: Settings;
+  isLive: boolean;
+  dataCount: number;
+  playback: PlaybackState;
+  isLiveMode: boolean;
+  onGoLive: () => void;
+  onExitLive: () => void;
+}
+
+const SPEEDS = [1, 2, 5, 10];
+
+export default function LiveMonitor({ currentPoint, metrics, settings, isLive, dataCount, playback, isLiveMode, onGoLive, onExitLive }: Props) {
+  if (!currentPoint) {
+    return (
+      <div className="text-text-secondary text-[13px] p-6">
+        No data loaded. Generate a simulation or import CSV.
+      </div>
+    );
+  }
+
+  const displayHour = isLiveMode ? currentPoint.time : playback.simulatedHour;
+  const violation = metrics.dischargeMin > metrics.chargeMin;
+
+  const handleScrub = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onExitLive();
+    playback.setPosition(parseFloat(e.target.value));
+  };
+
+  const handlePlayPause = () => {
+    if (playback.isPlaying) {
+      playback.pause();
+    } else {
+      onExitLive();
+      playback.play();
+    }
+  };
+
+  const handleSkipToStart = () => {
+    onExitLive();
+    playback.skipToStart();
+  };
+
+  const handleSkipToEnd = () => {
+    onExitLive();
+    playback.skipToEnd();
+  };
+
+  return (
+    <div className="space-y-6">
+      <Notifications currentPoint={currentPoint} settings={settings} isLive={isLive && isLiveMode} />
+
+      {/* Flow Diagram */}
+      <FlowDiagram currentPoint={currentPoint} settings={settings} />
+
+      {/* Metrics — centred */}
+      <div className="flex flex-col items-center">
+        {/* Hero Renewable % */}
+        <div className="text-center">
+          <div className="text-[10px] uppercase tracking-[0.08em] text-text-secondary mb-1">RENEWABLE</div>
+          <div className="font-mono text-[56px] font-semibold text-battery leading-none">
+            {metrics.renewablePct.toFixed(1)}
+            <span className="text-[30px] opacity-60">%</span>
+          </div>
+        </div>
+
+        {/* Three metric cards */}
+        <div className="flex gap-4 mt-6 w-full max-w-2xl">
+          {/* Energy (Load) */}
+          <div className="bg-bg-surface1 border border-border-default rounded-xl p-5 flex-1 min-w-[180px]">
+            <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted mb-2">ENERGY (LOAD)</div>
+            <div className="font-mono text-[22px] text-text-primary">
+              {metrics.totalEnergy.toFixed(2)}
+              <span className="text-[10px] text-text-tertiary ml-1">kWh</span>
+            </div>
+          </div>
+
+          {/* Battery Balance */}
+          <div className="bg-bg-surface1 border border-border-default rounded-xl p-5 flex-1 min-w-[180px]">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted">BAT BALANCE</div>
+              {violation
+                ? <X size={14} className="text-error" />
+                : <Check size={14} className="text-battery" />
+              }
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-sm bg-battery shrink-0" />
+                <span className="text-[11px] font-mono text-battery">
+                  {metrics.chargeMin.toFixed(0)}m
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-sm shrink-0 ${violation ? 'bg-error' : 'bg-text-secondary'}`} />
+                <span className={`text-[11px] font-mono ${violation ? 'text-error' : 'text-text-secondary'}`}>
+                  {metrics.dischargeMin.toFixed(0)}m
+                </span>
+              </div>
+            </div>
+            {violation && (
+              <div className="text-[10px] font-semibold text-error uppercase tracking-wider mt-2">
+                40% CAP RISK
+              </div>
+            )}
+          </div>
+
+          {/* Mains Use */}
+          <div className="bg-bg-surface1 border border-border-default rounded-xl p-5 flex-1 min-w-[180px]">
+            <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted mb-2">MAINS USE</div>
+            <div className="font-mono text-[22px] text-mains">
+              {metrics.mainsDependency.toFixed(1)}
+              <span className="text-[10px] text-text-tertiary ml-1">%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Unmet demand */}
+        <div className="text-center mt-4 font-mono text-[13px]">
+          {metrics.unmetDemand > 0 && <AlertTriangle size={14} className="inline mr-1" />}
+          <span className={metrics.unmetDemand > 0 ? 'text-warning' : 'text-text-muted'}>
+            {metrics.unmetDemand.toFixed(1)}% unmet
+          </span>
+        </div>
+
+        {/* Simulated time */}
+        <div className="text-center mt-3 font-mono text-[12px] text-text-tertiary">
+          Simulated Time: {formatTime(displayHour)} — {playback.position + 1}/{dataCount}
+        </div>
+      </div>
+
+      {/* Playback scrubber */}
+      <div className="sticky bottom-0 left-0 right-0 bg-bg-surface1 border-t border-border-default px-6 py-3 flex items-center gap-4 z-40">
+        {/* Skip to start */}
+        <button
+          onClick={handleSkipToStart}
+          className="text-text-secondary hover:text-text-primary transition-colors"
+        >
+          <SkipBack size={16} />
+        </button>
+
+        {/* Play/Pause */}
+        <button
+          onClick={handlePlayPause}
+          className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-white hover:opacity-90 transition-opacity"
+        >
+          {playback.isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
+        </button>
+
+        {/* Skip to end */}
+        <button
+          onClick={handleSkipToEnd}
+          className="text-text-secondary hover:text-text-primary transition-colors"
+        >
+          <SkipForward size={16} />
+        </button>
+
+        {/* Scrubber */}
+        <input
+          type="range"
+          min="0"
+          max="24"
+          step="0.01"
+          value={isLiveMode ? 24 : playback.simulatedHour}
+          onChange={handleScrub}
+          className="flex-1 h-1 appearance-none bg-bg-surface3 rounded-full cursor-pointer
+            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3
+            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent"
+        />
+
+        {/* Time display */}
+        <span className="font-mono text-[14px] text-text-primary w-14 text-right">
+          {formatTime(displayHour)}
+        </span>
+
+        {/* Speed selector */}
+        <div className="flex gap-1">
+          {SPEEDS.map((s) => (
+            <button
+              key={s}
+              onClick={() => playback.setSpeed(s)}
+              className={`px-2 py-0.5 text-[11px] rounded transition-colors ${
+                playback.speed === s
+                  ? 'bg-accent text-white'
+                  : 'text-text-tertiary hover:text-text-secondary'
+              }`}
+            >
+              {s}x
+            </button>
+          ))}
+        </div>
+
+        {/* LIVE button */}
+        <button
+          onClick={onGoLive}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] uppercase tracking-[0.08em] rounded-md border transition-colors ${
+            isLiveMode
+              ? 'border-battery/50 text-battery'
+              : 'border-border-default text-text-tertiary hover:text-text-secondary'
+          }`}
+        >
+          <div
+            className={`w-2 h-2 rounded-full ${
+              isLiveMode ? 'bg-battery animate-pulse' : 'bg-text-muted'
+            }`}
+          />
+          <Radio size={12} />
+          LIVE
+        </button>
+
+        {/* Point count */}
+        <span className="text-[11px] text-text-tertiary">
+          {dataCount} pts
+        </span>
+      </div>
+    </div>
+  );
+}
