@@ -19,18 +19,24 @@ interface Props {
 
 const SPEEDS = [1, 2, 5, 10];
 
+const EMPTY_POINT: DataPoint = {
+  time: 0, wind: 0, pv: 0, vbus: 240, ibus: 0,
+  cl1: 0, cl2: 0, cl3: 0, mainsRequest: 0,
+  ls1: 0, ls2: 0, ls3: 0, bchg: 0, bdis: 0, soc: 0,
+};
+
 export default function LiveMonitor({ currentPoint, metrics, settings, isLive, dataCount, playback, isLiveMode, onGoLive, onExitLive }: Props) {
-  if (!currentPoint) {
+  if (!currentPoint && !isLive) {
     return (
       <div className="text-text-secondary text-[13px] p-6">
-        {isLive
-          ? 'Waiting for serial data...'
-          : 'No data loaded. Generate a simulation or import CSV.'}
+        No data loaded. Generate a simulation or import CSV.
       </div>
     );
   }
 
-  const displayHour = isLiveMode ? currentPoint.time : playback.simulatedHour;
+  const point = currentPoint ?? EMPTY_POINT;
+  const waitingForData = !currentPoint && isLive;
+  const displayHour = isLiveMode ? point.time : playback.simulatedHour;
   const violation = metrics.dischargeMin > metrics.chargeMin;
 
   const handleScrub = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,10 +65,15 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
 
   return (
     <div className="space-y-6">
-      <Notifications currentPoint={currentPoint} settings={settings} isLive={isLive && isLiveMode} />
+      {waitingForData && (
+        <div className="text-center text-text-secondary text-[13px] py-2 animate-pulse">
+          Waiting for serial data...
+        </div>
+      )}
+      <Notifications currentPoint={point} settings={settings} isLive={isLive && isLiveMode} />
 
       {/* Flow Diagram */}
-      <FlowDiagram currentPoint={currentPoint} settings={settings} />
+      <FlowDiagram currentPoint={point} settings={settings} />
 
       {/* Metrics — centred */}
       <div className="flex flex-col items-center">
