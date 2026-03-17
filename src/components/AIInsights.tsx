@@ -185,13 +185,9 @@ export default function AIInsights({
 }: Props) {
   const [input, setInput] = useState('');
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
-  const [viewState, setViewState] = useState<'empty' | 'fade-out-empty' | 'active' | 'fade-out-active'>(
-    messages.length === 0 ? 'empty' : 'active'
-  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const isUserScrolledUpRef = useRef(false);
-  const prevMsgLenRef = useRef(messages.length);
 
   // Textarea auto-grow
   const adjustTextareaHeight = useCallback(() => {
@@ -226,30 +222,6 @@ export default function AIInsights({
     el.scrollTop = el.scrollHeight;
   }, [messages]);
 
-  // Transition between empty and active states
-  useEffect(() => {
-    const hasMessages = messages.length > 0;
-    prevMsgLenRef.current = messages.length;
-
-    if (hasMessages && viewState === 'empty') {
-      setViewState('fade-out-empty');
-      const timer = setTimeout(() => setViewState('active'), 150);
-      return () => clearTimeout(timer);
-    }
-    if (!hasMessages && viewState === 'active') {
-      setViewState('fade-out-active');
-      const timer = setTimeout(() => setViewState('empty'), 150);
-      return () => clearTimeout(timer);
-    }
-    // If messages exist on mount but state is wrong, fix it
-    if (hasMessages && (viewState === 'fade-out-active')) {
-      setViewState('active');
-    }
-    if (!hasMessages && (viewState === 'fade-out-empty')) {
-      setViewState('empty');
-    }
-  }, [messages.length, viewState]);
-
   // Copy handler
   const handleCopy = useCallback((text: string, idx: number) => {
     navigator.clipboard.writeText(text);
@@ -283,8 +255,8 @@ export default function AIInsights({
     }
   };
 
-  const isEmptyView = viewState === 'empty' || viewState === 'fade-out-empty';
-  const isActiveView = viewState === 'active' || viewState === 'fade-out-active';
+  const isEmptyView = messages.length === 0;
+  const isActiveView = messages.length > 0;
 
   // Shared textarea + send button container
   const renderInputContainer = (placeholder: string) => (
@@ -341,8 +313,7 @@ export default function AIInsights({
       {/* Empty State */}
       {isEmptyView && (
         <div
-          className="flex-1 flex items-center justify-center transition-opacity duration-150"
-          style={{ opacity: viewState === 'fade-out-empty' ? 0 : 1 }}
+          className="flex-1 flex items-center justify-center"
         >
           <div className="w-full max-w-2xl px-4">
             {/* Greeting */}
@@ -382,11 +353,7 @@ export default function AIInsights({
       {/* Active State */}
       {isActiveView && (
         <div
-          className="flex-1 flex flex-col min-h-0 transition-all duration-200"
-          style={{
-            opacity: viewState === 'fade-out-active' ? 0 : 1,
-            transform: viewState === 'fade-out-active' ? 'translateY(8px)' : 'translateY(0)',
-          }}
+          className="flex-1 flex flex-col min-h-0"
         >
           {/* Zone 1 — Quick actions (top, sticky) */}
           <div className="flex items-center py-3 border-b border-border-subtle">
