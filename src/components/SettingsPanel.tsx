@@ -167,26 +167,26 @@ export default function SettingsPanel({
   const hasSerial = typeof navigator !== 'undefined' && 'serial' in navigator;
 
   return (
-    <div className="space-y-6">
-      {/* System Configuration */}
-      <div>
+    <div className="space-y-4">
+      {/* System Configuration — compact grid */}
+      <div className="bg-bg-surface1 border border-border-default rounded-xl p-4">
         <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
           SYSTEM CONFIGURATION
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-4 gap-3">
           {([
-            ['maxWind', 'Max Wind Capacity', 'A', 0, 5, 0.1],
-            ['maxPV', 'Max PV Capacity', 'A', 0, 5, 0.1],
-            ['maxMains', 'Max Mains Capacity', 'A', 0, 10, 0.1],
-            ['batteryRate', 'Charge/Discharge Rate', 'A', 0, 5, 0.1],
-            ['refCapacity', 'Reference Battery Capacity', 'Ah', 1, 50, 0.5],
-            ['load1Demand', 'Load 1 Demand', 'A', 0, 5, 0.1],
-            ['load2Demand', 'Load 2 Demand', 'A', 0, 5, 0.1],
-            ['load3Demand', 'Load 3 Demand', 'A', 0, 5, 0.1],
+            ['maxWind', 'Max Wind', 'A', 0, 5, 0.1],
+            ['maxPV', 'Max PV', 'A', 0, 5, 0.1],
+            ['maxMains', 'Max Mains', 'A', 0, 10, 0.1],
+            ['batteryRate', 'Bat Rate', 'A', 0, 5, 0.1],
+            ['refCapacity', 'Ref Cap', 'Ah', 1, 50, 0.5],
+            ['load1Demand', 'Load 1', 'A', 0, 5, 0.1],
+            ['load2Demand', 'Load 2', 'A', 0, 5, 0.1],
+            ['load3Demand', 'Load 3', 'A', 0, 5, 0.1],
           ] as [keyof Settings, string, string, number, number, number][]).map(([key, label, unit, min, max, step]) => (
-            <div key={key} className="bg-bg-surface1 border border-border-default rounded-xl p-6">
-              <label className="text-[13px] text-text-secondary block mb-1">{label}</label>
-              <div className="flex items-center">
+            <div key={key}>
+              <label className="text-[11px] text-text-tertiary block mb-1">{label}</label>
+              <div className="flex items-center gap-1.5">
                 <input
                   type="number"
                   min={min}
@@ -194,103 +194,52 @@ export default function SettingsPanel({
                   step={step}
                   value={settings[key]}
                   onChange={(e) => updateSetting(key, parseFloat(e.target.value) || 0, min, max)}
-                  className="flex-1 bg-bg-surface2 border border-border-default rounded-lg px-3 py-2 text-[13px] font-mono text-text-primary
+                  className="w-full bg-bg-surface2 border border-border-default rounded-lg px-2 py-1.5 text-[12px] font-mono text-text-primary
                     focus:outline-none focus:[box-shadow:0_0_0_2px_rgba(160,200,255,0.4)]"
                 />
-                <span className="text-[13px] text-text-secondary font-mono ml-3">{unit}</span>
+                <span className="text-[11px] text-text-tertiary font-mono shrink-0">{unit}</span>
               </div>
             </div>
           ))}
         </div>
-        <p className="text-[12px] text-text-secondary mt-3">
-          Reference Battery Capacity is a display convention. The handbook battery has unlimited capacity. Defaults match handbook test values.
-        </p>
       </div>
 
-      {/* Bluetooth + Data side by side */}
-      <div className="flex gap-4">
-      {/* Bluetooth / Serial */}
-      <div className="flex-1 bg-bg-surface1 border border-border-default rounded-xl p-5">
-        <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-4">
-          BLUETOOTH CONNECTION
-        </div>
-        <div className="text-[11px] font-mono text-text-tertiary mb-3 bg-bg-surface2 rounded-lg p-3">
-          $,wind,pv,vbus_rms,ibus_rms,cl1,cl2,cl3,mains_request,ls1,ls2,ls3,bchg,bdis,soc
-        </div>
-        {hasSerial ? (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={serial.isConnected ? serial.disconnect : serial.connect}
-              className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default rounded-lg hover:bg-bg-surface3 transition-colors"
-            >
-              {serial.isConnected ? <BluetoothOff size={14} /> : <Bluetooth size={14} />}
-              {serial.isConnected ? 'Disconnect' : 'Connect via Bluetooth'}
-            </button>
-            <button
-              onClick={() => setShowTerminal((v) => !v)}
-              className={`flex items-center gap-2 px-3 py-2 text-[12px] border rounded-lg transition-colors ${
-                showTerminal
-                  ? 'border-accent text-accent bg-bg-surface2'
-                  : 'border-border-default text-text-secondary hover:bg-bg-surface3'
-              }`}
-            >
-              <Terminal size={14} />
-              {showTerminal ? 'Hide Terminal' : 'Show Terminal'}
-            </button>
-          </div>
-        ) : (
-          <div className="text-[12px] text-error">
-            Web Serial not available. Chrome required.
-          </div>
-        )}
-        {showTerminal && (
-          <div className="mt-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary">
-                SERIAL TERMINAL ({serial.rawLines.length} lines)
-              </span>
+      {/* Data toolbar — single row */}
+      <div className="bg-bg-surface1 border border-border-default rounded-xl px-4 py-3">
+        <div className="flex items-center gap-3">
+          {/* Bluetooth */}
+          {hasSerial ? (
+            <>
               <button
-                onClick={serial.clearRawLines}
-                className="flex items-center gap-1 px-2 py-1 text-[10px] text-text-tertiary hover:text-text-secondary transition-colors"
+                onClick={serial.isConnected ? serial.disconnect : serial.connect}
+                className="flex items-center gap-2 px-3 py-1.5 text-[12px] border border-border-default rounded-lg hover:bg-bg-surface3 transition-colors"
               >
-                <Trash2 size={10} />
-                Clear
+                {serial.isConnected ? <BluetoothOff size={14} /> : <Bluetooth size={14} />}
+                {serial.isConnected ? 'Disconnect' : 'Connect'}
               </button>
-            </div>
-            <div
-              ref={terminalRef}
-              onScroll={(e) => {
-                const el = e.currentTarget;
-                const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
-                userScrolledRef.current = !atBottom;
-              }}
-              className="bg-black border border-border-default rounded-xl p-3 max-h-[300px] overflow-y-auto"
-            >
-              {serial.rawLines.length === 0 ? (
-                <div className="text-[11px] font-mono text-text-muted">
-                  {serial.isConnected ? 'Waiting for data...' : 'Connect to see serial data'}
-                </div>
-              ) : (
-                serial.rawLines.map((line, i) => (
-                  <div key={i} className="text-[11px] font-mono text-text-secondary leading-5 whitespace-pre">
-                    {line}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+              <button
+                onClick={() => setShowTerminal((v) => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] border rounded-lg transition-colors ${
+                  showTerminal
+                    ? 'border-accent text-accent bg-bg-surface2'
+                    : 'border-border-default text-text-secondary hover:bg-bg-surface3'
+                }`}
+              >
+                <Terminal size={14} />
+                Terminal
+              </button>
+            </>
+          ) : (
+            <span className="text-[11px] text-error">No Web Serial</span>
+          )}
 
-      {/* CSV Import/Export */}
-      <div className="flex-1 bg-bg-surface1 border border-border-default rounded-xl p-5">
-        <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-4">
-          DATA IMPORT / EXPORT
-        </div>
-        <div className="flex gap-3">
+          {/* Divider */}
+          <div className="border-l border-border-default h-6" />
+
+          {/* CSV / Data */}
           <button
             onClick={() => fileRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2 text-[12px] bg-accent text-white rounded-lg"
+            className="flex items-center gap-2 px-3 py-1.5 text-[12px] bg-accent text-white rounded-lg"
           >
             <Upload size={14} />
             Import CSV
@@ -305,24 +254,64 @@ export default function SettingsPanel({
           <button
             onClick={onExport}
             disabled={rawData.length === 0}
-            className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3 disabled:opacity-40"
+            className="flex items-center gap-2 px-3 py-1.5 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3 disabled:opacity-40"
           >
             <Download size={14} />
-            Export CSV
+            Export
           </button>
           <button
             onClick={onRegenerate}
-            className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3"
+            className="flex items-center gap-2 px-3 py-1.5 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3"
           >
             <RefreshCw size={14} />
-            Regenerate Simulation
+            Regenerate
           </button>
-        </div>
-        <div className="mt-2 text-[11px] text-text-tertiary">
-          Source: {dataSource} | {rawData.length} data points
+
+          {/* Status */}
+          <div className="ml-auto text-[11px] text-text-tertiary font-mono">
+            {dataSource} | {rawData.length} pts
+          </div>
         </div>
       </div>
-      </div>
+
+      {/* Terminal — full width */}
+      {showTerminal && (
+        <div className="bg-bg-surface1 border border-border-default rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary">
+              SERIAL TERMINAL ({serial.rawLines.length} lines)
+            </span>
+            <button
+              onClick={serial.clearRawLines}
+              className="flex items-center gap-1 px-2 py-1 text-[10px] text-text-tertiary hover:text-text-secondary transition-colors"
+            >
+              <Trash2 size={10} />
+              Clear
+            </button>
+          </div>
+          <div
+            ref={terminalRef}
+            onScroll={(e) => {
+              const el = e.currentTarget;
+              const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+              userScrolledRef.current = !atBottom;
+            }}
+            className="bg-black border border-border-default rounded-xl p-3 max-h-[500px] overflow-y-auto"
+          >
+            {serial.rawLines.length === 0 ? (
+              <div className="text-[11px] font-mono text-text-muted">
+                {serial.isConnected ? 'Waiting for data...' : 'Connect to see serial data'}
+              </div>
+            ) : (
+              serial.rawLines.map((line, i) => (
+                <div key={i} className="text-[11px] font-mono text-text-secondary leading-5 whitespace-pre">
+                  {line}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Column mapping screen */}
       {csvHeaders && (
