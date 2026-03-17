@@ -23,7 +23,9 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
   if (!currentPoint) {
     return (
       <div className="text-text-secondary text-[13px] p-6">
-        No data loaded. Generate a simulation or import CSV.
+        {isLive
+          ? 'Waiting for serial data...'
+          : 'No data loaded. Generate a simulation or import CSV.'}
       </div>
     );
   }
