@@ -168,8 +168,8 @@ export default function SettingsPanel({
 
   return (
     <div className="space-y-4">
-      {/* System Configuration — compact grid */}
-      <div className="bg-bg-surface1 border border-border-default rounded-xl p-4">
+      {/* System Configuration */}
+      <div>
         <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
           SYSTEM CONFIGURATION
         </div>
@@ -184,8 +184,8 @@ export default function SettingsPanel({
             ['load2Demand', 'Load 2', 'A', 0, 5, 0.1],
             ['load3Demand', 'Load 3', 'A', 0, 5, 0.1],
           ] as [keyof Settings, string, string, number, number, number][]).map(([key, label, unit, min, max, step]) => (
-            <div key={key}>
-              <label className="text-[11px] text-text-tertiary block mb-1">{label}</label>
+            <div key={key} className="bg-bg-surface1 border border-border-default rounded-xl p-3">
+              <label className="text-[11px] text-text-tertiary block mb-1.5">{label}</label>
               <div className="flex items-center gap-1.5">
                 <input
                   type="number"
@@ -194,7 +194,7 @@ export default function SettingsPanel({
                   step={step}
                   value={settings[key]}
                   onChange={(e) => updateSetting(key, parseFloat(e.target.value) || 0, min, max)}
-                  className="w-full bg-bg-surface2 border border-border-default rounded-lg px-2 py-1.5 text-[12px] font-mono text-text-primary
+                  className="w-full bg-bg-surface2 border border-border-default rounded-lg px-2.5 py-1.5 text-[13px] font-mono text-text-primary
                     focus:outline-none focus:[box-shadow:0_0_0_2px_rgba(160,200,255,0.4)]"
                 />
                 <span className="text-[11px] text-text-tertiary font-mono shrink-0">{unit}</span>
@@ -204,71 +204,78 @@ export default function SettingsPanel({
         </div>
       </div>
 
-      {/* Data toolbar — single row */}
-      <div className="bg-bg-surface1 border border-border-default rounded-xl px-4 py-3">
-        <div className="flex items-center gap-3">
-          {/* Bluetooth */}
+      {/* Bluetooth + Data — two cards side by side */}
+      <div className="flex gap-4">
+        {/* Bluetooth */}
+        <div className="flex-1 bg-bg-surface1 border border-border-default rounded-xl p-4">
+          <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
+            BLUETOOTH CONNECTION
+          </div>
           {hasSerial ? (
-            <>
+            <div className="flex items-center gap-2">
               <button
                 onClick={serial.isConnected ? serial.disconnect : serial.connect}
-                className="flex items-center gap-2 px-3 py-1.5 text-[12px] border border-border-default rounded-lg hover:bg-bg-surface3 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default rounded-lg hover:bg-bg-surface3 transition-colors"
               >
                 {serial.isConnected ? <BluetoothOff size={14} /> : <Bluetooth size={14} />}
-                {serial.isConnected ? 'Disconnect' : 'Connect'}
+                {serial.isConnected ? 'Disconnect' : 'Connect via Bluetooth'}
               </button>
               <button
                 onClick={() => setShowTerminal((v) => !v)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] border rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2 text-[12px] border rounded-lg transition-colors ${
                   showTerminal
                     ? 'border-accent text-accent bg-bg-surface2'
                     : 'border-border-default text-text-secondary hover:bg-bg-surface3'
                 }`}
               >
                 <Terminal size={14} />
-                Terminal
+                {showTerminal ? 'Hide Terminal' : 'Show Terminal'}
               </button>
-            </>
+            </div>
           ) : (
-            <span className="text-[11px] text-error">No Web Serial</span>
+            <div className="text-[12px] text-error">
+              Web Serial not available. Chrome required.
+            </div>
           )}
+        </div>
 
-          {/* Divider */}
-          <div className="border-l border-border-default h-6" />
-
-          {/* CSV / Data */}
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="flex items-center gap-2 px-3 py-1.5 text-[12px] bg-accent text-white rounded-lg"
-          >
-            <Upload size={14} />
-            Import CSV
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".csv"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-          <button
-            onClick={onExport}
-            disabled={rawData.length === 0}
-            className="flex items-center gap-2 px-3 py-1.5 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3 disabled:opacity-40"
-          >
-            <Download size={14} />
-            Export
-          </button>
-          <button
-            onClick={onRegenerate}
-            className="flex items-center gap-2 px-3 py-1.5 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3"
-          >
-            <RefreshCw size={14} />
-            Regenerate
-          </button>
-
-          {/* Status */}
-          <div className="ml-auto text-[11px] text-text-tertiary font-mono">
+        {/* Data Import / Export */}
+        <div className="flex-1 bg-bg-surface1 border border-border-default rounded-xl p-4">
+          <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
+            DATA IMPORT / EXPORT
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="flex items-center gap-2 px-4 py-2 text-[12px] bg-accent text-white rounded-lg"
+            >
+              <Upload size={14} />
+              Import CSV
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <button
+              onClick={onExport}
+              disabled={rawData.length === 0}
+              className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3 disabled:opacity-40"
+            >
+              <Download size={14} />
+              Export
+            </button>
+            <button
+              onClick={onRegenerate}
+              className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default text-text-secondary rounded-lg hover:bg-bg-surface3"
+            >
+              <RefreshCw size={14} />
+              Regenerate
+            </button>
+          </div>
+          <div className="mt-2 text-[11px] text-text-tertiary font-mono">
             {dataSource} | {rawData.length} pts
           </div>
         </div>
