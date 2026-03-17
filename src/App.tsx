@@ -104,7 +104,10 @@ function App() {
       setTab1Live(true);
       setDataSource('serial');
       setRawData([]);
+      livePlayback.skipToStart();
+      playback.skipToStart();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serial.isConnected]);
 
   // Serial data appending

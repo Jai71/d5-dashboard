@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { DataPoint, Settings } from '../types';
 import type { SerialState } from '../hooks/useSerial';
 import { formatTime } from '../calculations';
 import Papa from 'papaparse';
-import { Upload, Download, RefreshCw, Bluetooth, BluetoothOff } from 'lucide-react';
+import { Upload, Download, RefreshCw, Bluetooth, BluetoothOff, Terminal, Trash2 } from 'lucide-react';
 
 interface Props {
   settings: Settings;
@@ -54,9 +54,18 @@ export default function SettingsPanel({
   serial, rawData, playbackPosition, onRegenerate,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
   const [csvHeaders, setCsvHeaders] = useState<string[] | null>(null);
   const [csvRows, setCsvRows] = useState<Record<string, unknown>[]>([]);
   const [mapping, setMapping] = useState<Record<keyof DataPoint, string>>({} as Record<keyof DataPoint, string>);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const userScrolledRef = useRef(false);
+
+  // Auto-scroll terminal to bottom unless user has scrolled up
+  useEffect(() => {
+    if (!showTerminal || !terminalRef.current || userScrolledRef.current) return;
+    terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+  }, [showTerminal, serial.rawLines]);
 
   const updateSetting = (key: keyof Settings, value: number, min: number, max: number) => {
     const clamped = Math.min(max, Math.max(min, value));
@@ -209,16 +218,66 @@ export default function SettingsPanel({
           $,wind,pv,vbus_rms,ibus_rms,cl1,cl2,cl3,mains_request,ls1,ls2,ls3,bchg,bdis,soc
         </div>
         {hasSerial ? (
-          <button
-            onClick={serial.isConnected ? serial.disconnect : serial.connect}
-            className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default rounded-lg hover:bg-bg-surface3 transition-colors"
-          >
-            {serial.isConnected ? <BluetoothOff size={14} /> : <Bluetooth size={14} />}
-            {serial.isConnected ? 'Disconnect' : 'Connect via Bluetooth'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={serial.isConnected ? serial.disconnect : serial.connect}
+              className="flex items-center gap-2 px-4 py-2 text-[12px] border border-border-default rounded-lg hover:bg-bg-surface3 transition-colors"
+            >
+              {serial.isConnected ? <BluetoothOff size={14} /> : <Bluetooth size={14} />}
+              {serial.isConnected ? 'Disconnect' : 'Connect via Bluetooth'}
+            </button>
+            <button
+              onClick={() => setShowTerminal((v) => !v)}
+              className={`flex items-center gap-2 px-3 py-2 text-[12px] border rounded-lg transition-colors ${
+                showTerminal
+                  ? 'border-accent text-accent bg-bg-surface2'
+                  : 'border-border-default text-text-secondary hover:bg-bg-surface3'
+              }`}
+            >
+              <Terminal size={14} />
+              {showTerminal ? 'Hide Terminal' : 'Show Terminal'}
+            </button>
+          </div>
         ) : (
           <div className="text-[12px] text-error">
             Web Serial not available. Chrome required.
+          </div>
+        )}
+        {showTerminal && (
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary">
+                SERIAL TERMINAL ({serial.rawLines.length} lines)
+              </span>
+              <button
+                onClick={serial.clearRawLines}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] text-text-tertiary hover:text-text-secondary transition-colors"
+              >
+                <Trash2 size={10} />
+                Clear
+              </button>
+            </div>
+            <div
+              ref={terminalRef}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+                userScrolledRef.current = !atBottom;
+              }}
+              className="bg-black border border-border-default rounded-xl p-3 max-h-[300px] overflow-y-auto"
+            >
+              {serial.rawLines.length === 0 ? (
+                <div className="text-[11px] font-mono text-text-muted">
+                  {serial.isConnected ? 'Waiting for data...' : 'Connect to see serial data'}
+                </div>
+              ) : (
+                serial.rawLines.map((line, i) => (
+                  <div key={i} className="text-[11px] font-mono text-text-secondary leading-5 whitespace-pre">
+                    {line}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         )}
       </div>

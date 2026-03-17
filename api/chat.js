@@ -35,15 +35,29 @@ export default async function handler(req, res) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        res.end();
-        return;
+    // Cancel OpenAI stream if client disconnects
+    req.on('close', () => {
+      reader.cancel().catch(() => {});
+    });
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          res.end();
+          return;
+        }
+        res.write(decoder.decode(value, { stream: true }));
       }
-      res.write(decoder.decode(value, { stream: true }));
+    } catch {
+      // Stream interrupted (client disconnect or read error)
+      res.end();
     }
   } catch (err) {
-    res.status(500).json({ error: 'Proxy request failed' });
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Proxy request failed' });
+    } else {
+      res.end();
+    }
   }
 }
