@@ -126,7 +126,7 @@ export default function FlowDiagram({ currentPoint, settings }: Props) {
   const socFillHeight = settings.refCapacity > 0 ? Math.min((d.soc / settings.refCapacity) * 56, 56) : 0;
 
   return (
-    <div className="bg-bg-surface1 border-0 sm:border sm:border-border-default rounded-none sm:rounded-xl p-0 sm:p-3">
+    <div className="bg-bg-surface1 border border-border-default rounded-xl p-1 sm:p-3">
       <div className="relative w-full">
         <svg
           viewBox="-15 70 800 300"

@@ -72,15 +72,13 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
       )}
       <Notifications currentPoint={point} settings={settings} isLive={isLive && isLiveMode} />
 
-      {/* Flow Diagram — full bleed on mobile */}
-      <div className="-mx-3 sm:mx-0">
-        <FlowDiagram currentPoint={point} settings={settings} />
-      </div>
+      {/* Flow Diagram */}
+      <FlowDiagram currentPoint={point} settings={settings} />
 
       {/* Metric strip */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 mt-3 sm:mt-4">
         {/* Renewable % */}
-        <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-xl p-4">
+        <div className="bg-bg-surface1 border border-border-default rounded-xl p-3 sm:p-4">
           <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted mb-2">RENEWABLE</div>
           <div className="font-mono text-[18px] sm:text-[22px] text-battery">
             {metrics.renewablePct.toFixed(1)}
@@ -89,7 +87,7 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
         </div>
 
         {/* Energy (Load) */}
-        <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-xl p-4">
+        <div className="bg-bg-surface1 border border-border-default rounded-xl p-3 sm:p-4">
           <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted mb-2">ENERGY (LOAD)</div>
           <div className="font-mono text-[18px] sm:text-[22px] text-text-primary">
             {metrics.totalEnergy.toFixed(2)}
@@ -98,7 +96,7 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
         </div>
 
         {/* Battery Balance */}
-        <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-xl p-4">
+        <div className="bg-bg-surface1 border border-border-default rounded-xl p-3 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted">BAT BALANCE</div>
             {violation
@@ -124,7 +122,7 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
         </div>
 
         {/* Mains Use */}
-        <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-xl p-4">
+        <div className="bg-bg-surface1 border border-border-default rounded-xl p-3 sm:p-4">
           <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted mb-2">MAINS USE</div>
           <div className="font-mono text-[18px] sm:text-[22px] text-mains">
             {metrics.mainsDependency.toFixed(1)}
@@ -133,7 +131,7 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
         </div>
 
         {/* Unmet Demand */}
-        <div className={`bg-bg-surface1 border rounded-2xl sm:rounded-xl p-4 ${
+        <div className={`bg-bg-surface1 border rounded-xl p-3 sm:p-4 ${
           metrics.unmetDemand > 0 ? 'border-warning/40' : 'border-border-default'
         }`}>
           <div className="text-[9px] uppercase tracking-[0.08em] text-text-muted mb-2">UNMET</div>
@@ -149,7 +147,7 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
       <div className="flex-1" />
 
       {/* Playback scrubber */}
-      <div className="fixed bottom-14 left-0 right-0 z-40 sm:relative sm:bottom-auto sm:z-auto bg-bg-surface1 border-t border-border-default px-3 sm:px-6 py-2 sm:py-3 flex items-center gap-2 sm:gap-4 sm:-mx-6 sm:-mb-6">
+      <div className="bg-bg-surface1 border-t border-border-default px-3 sm:px-6 py-3 flex items-center gap-2 sm:gap-4 -mx-3 sm:-mx-6 -mb-3 sm:-mb-6">
         {/* Skip to start */}
         <button
           onClick={handleSkipToStart}
