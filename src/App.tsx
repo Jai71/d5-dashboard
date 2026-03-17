@@ -192,12 +192,12 @@ function App() {
       )}
 
       {/* Tab bar */}
-      <nav className="flex items-center border-b border-border-default">
+      <nav className="flex items-center border-b border-border-default overflow-x-auto">
         {TABS.map((tab, i) => (
           <button
             key={tab.label}
             onClick={() => setActiveTab(i)}
-            className={`flex items-center gap-2 px-5 py-2.5 text-[12px] tracking-[0.08em] transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 text-[11px] sm:text-[12px] tracking-[0.08em] transition-colors shrink-0 ${
               activeTab === i
                 ? 'text-text-primary border-b-2 border-accent'
                 : 'text-text-tertiary hover:text-text-secondary'
@@ -215,7 +215,7 @@ function App() {
         >
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <div className="flex items-center gap-1.5 px-5">
+        <div className="flex items-center gap-1.5 px-3 sm:px-5">
           <div className={`w-1.5 h-1.5 rounded-full ${
             serial.isConnected ? 'bg-battery animate-pulse' : 'bg-text-tertiary'
           }`} />
@@ -226,7 +226,7 @@ function App() {
       </nav>
 
       {/* Tab content */}
-      <main className="p-6">
+      <main className="p-3 sm:p-6">
         {activeTab === 0 && (
           <LiveMonitor
             currentPoint={tab1CurrentPoint}

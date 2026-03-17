@@ -145,7 +145,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
       </div>
 
       {/* Middle row: Donut + Safety panel */}
-      <div className="grid grid-cols-[1fr_200px] gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_200px] gap-4">
         {/* Donut Chart */}
         <div className="bg-bg-surface1 border border-border-default rounded-[14px] p-4">
           <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
@@ -186,7 +186,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
               <div className="text-[9px] text-text-tertiary uppercase">kWh</div>
             </div>
           </div>
-          <div className="flex justify-center gap-4 mt-2 text-[10px] text-text-tertiary">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-2 text-[10px] text-text-tertiary">
             {donutData.map((d) => (
               <div key={d.name} className="flex items-center gap-1">
                 <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: d.color }} />

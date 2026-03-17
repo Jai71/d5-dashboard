@@ -173,7 +173,7 @@ export default function SettingsPanel({
         <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
           SYSTEM CONFIGURATION
         </div>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
           {([
             ['maxWind', 'Max Wind', 'A', 0, 5, 0.1],
             ['maxPV', 'Max PV', 'A', 0, 5, 0.1],
@@ -205,7 +205,7 @@ export default function SettingsPanel({
       </div>
 
       {/* Bluetooth + Data — two cards side by side */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         {/* Bluetooth */}
         <div className="flex-1 bg-bg-surface1 border border-border-default rounded-xl p-4">
           <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
@@ -244,7 +244,7 @@ export default function SettingsPanel({
           <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
             DATA IMPORT / EXPORT
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <button
               onClick={() => fileRef.current?.click()}
               className="flex items-center gap-2 px-4 py-2 text-[12px] bg-accent text-white rounded-lg"
@@ -303,7 +303,7 @@ export default function SettingsPanel({
               const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
               userScrolledRef.current = !atBottom;
             }}
-            className="bg-black border border-border-default rounded-xl p-3 max-h-[500px] overflow-y-auto"
+            className="bg-black border border-border-default rounded-xl p-3 max-h-[250px] sm:max-h-[500px] overflow-y-auto"
           >
             {serial.rawLines.length === 0 ? (
               <div className="text-[11px] font-mono text-text-muted">
@@ -329,7 +329,7 @@ export default function SettingsPanel({
           <div className="space-y-2">
             {SIGNAL_FIELDS.map((field) => (
               <div key={field} className="flex items-center gap-3">
-                <span className="w-28 text-[11px] font-mono text-text-secondary">{field}</span>
+                <span className="w-20 sm:w-28 text-[11px] font-mono text-text-secondary">{field}</span>
                 <select
                   value={mapping[field] || ''}
                   onChange={(e) => setMapping({ ...mapping, [field]: e.target.value })}

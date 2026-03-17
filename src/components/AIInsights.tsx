@@ -297,7 +297,7 @@ export default function AIInsights({
             onClick={() => !disabled && handleQuickAction(action.prompt)}
             disabled={disabled || isLoading}
             title={disabled ? 'Load data first' : undefined}
-            className={`px-4 py-2 text-[13px] rounded-full border bg-transparent transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-text-secondary hover:bg-bg-surface1 hover:border-text-muted ${
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[12px] sm:text-[13px] rounded-full border bg-transparent transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-text-secondary hover:bg-bg-surface1 hover:border-text-muted ${
               action.primary ? 'border-accent' : 'border-border-default'
             }`}
           >
@@ -309,17 +309,17 @@ export default function AIInsights({
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] relative">
+    <div className="flex flex-col h-[calc(100vh-100px)] sm:h-[calc(100vh-140px)] relative">
       {/* Empty State */}
       {isEmptyView && (
         <div
           className="flex-1 flex items-center justify-center"
         >
-          <div className="w-full max-w-2xl px-4">
+          <div className="w-full max-w-2xl px-2 sm:px-4">
             {/* Greeting */}
-            <div className="flex items-center gap-3 justify-center mb-6">
-              <Sparkles size={28} className="text-accent" />
-              <h2 className="text-[28px] font-semibold text-text-primary">
+            <div className="flex items-center gap-2 sm:gap-3 justify-center mb-6">
+              <Sparkles size={24} className="text-accent sm:w-7 sm:h-7" />
+              <h2 className="text-[20px] sm:text-[28px] font-semibold text-text-primary">
                 D5 Algorithm Advisor
               </h2>
             </div>
@@ -373,7 +373,7 @@ export default function AIInsights({
             onScroll={handleChatScroll}
             className="flex-1 overflow-y-auto py-5"
           >
-            <div className="max-w-3xl mx-auto space-y-5 px-4">
+            <div className="max-w-none sm:max-w-3xl mx-auto space-y-5 px-2 sm:px-4">
               {messages.map((msg, i) => {
                 if (msg.role === 'user') {
                   return (
@@ -429,7 +429,7 @@ export default function AIInsights({
 
           {/* Zone 3 — Input (bottom, sticky) */}
           <div className="pt-3 pb-2">
-            <div className="max-w-3xl mx-auto px-4">
+            <div className="max-w-none sm:max-w-3xl mx-auto px-2 sm:px-4">
               {renderInputContainer('Reply...')}
               <p className="text-[11px] text-text-muted text-center mt-2">
                 AI can make mistakes. Verify important information.
