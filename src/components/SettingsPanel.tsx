@@ -286,7 +286,7 @@ export default function SettingsPanel({
         <div className="bg-bg-surface1 border border-border-default rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary">
-              SERIAL TERMINAL ({serial.rawLines.length} lines)
+              SERIAL TERMINAL ({serial.rawLines.length} lines, {serial.packetCount} packets{serial.parseErrorCount > 0 ? `, ${serial.parseErrorCount} errors` : ''})
             </span>
             <button
               onClick={serial.clearRawLines}
@@ -311,7 +311,15 @@ export default function SettingsPanel({
               </div>
             ) : (
               serial.rawLines.map((line, i) => (
-                <div key={i} className="text-[11px] font-mono text-text-secondary leading-5 whitespace-pre">
+                <div key={i} className={`text-[11px] font-mono leading-5 whitespace-pre ${
+                  line.includes('[ERR]') || line.includes('[PARSE ERR]') || line.includes('[ERROR]')
+                    ? 'text-error'
+                    : line.includes('[CONNECTED]') || line.includes('[DISCONNECTED]')
+                      ? 'text-accent'
+                      : line.startsWith('  →')
+                        ? 'text-text-muted'
+                        : 'text-text-secondary'
+                }`}>
                   {line}
                 </div>
               ))

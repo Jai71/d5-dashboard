@@ -67,7 +67,7 @@ export default function LiveMonitor({ currentPoint, metrics, settings, isLive, d
     <div className="flex flex-col min-h-[calc(100vh-100px)] sm:min-h-[calc(100vh-140px)]">
       {waitingForData && (
         <div className="text-center text-text-secondary text-[13px] py-2 animate-pulse">
-          Waiting for serial data...
+          Waiting for serial data... ({dataCount} points received)
         </div>
       )}
       <Notifications currentPoint={point} settings={settings} isLive={isLive && isLiveMode} />
