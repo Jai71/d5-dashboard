@@ -98,9 +98,13 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, dataSource]);
 
-  // Auto-pin live when serial connects
+  // Auto-pin live when serial connects and switch data source
   useEffect(() => {
-    if (serial.isConnected) setTab1Live(true);
+    if (serial.isConnected) {
+      setTab1Live(true);
+      setDataSource('serial');
+      setRawData([]);
+    }
   }, [serial.isConnected]);
 
   // Serial data appending

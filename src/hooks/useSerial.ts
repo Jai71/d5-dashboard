@@ -32,30 +32,39 @@ export function useSerial(): SerialState {
     const offset = parts[0] === '$' ? 1 : 0;
     const values = parts.slice(offset);
 
-    if (values.length < 14) return null;
+    if (values.length < 2) return null;
+
+    // Log first 5 packets so we can see the raw format
+    if (packetCountRef.current < 5) {
+      console.log(`[Serial packet #${packetCountRef.current}] fields=${values.length}: ${line.trim()}`);
+    }
 
     try {
       packetCountRef.current++;
-      const hasTime = values.length >= 15;
-      const idx = (i: number) => (hasTime ? i : i - 1);
-      const timeValue = hasTime ? parseFloat(values[0]) : packetCountRef.current * 0.0005;
+      const v = (i: number) => (i < values.length ? parseFloat(values[i]) : 0);
+
+      // Time: first field. If in seconds (0-364), scale to hours (0-24).
+      let timeValue = v(0);
+      if (isNaN(timeValue)) timeValue = packetCountRef.current * 0.0005;
+      // Auto-detect seconds format: if time exceeds 24, assume seconds and convert
+      const timeHours = timeValue > 24 ? (timeValue / 364) * 24 : timeValue;
 
       return {
-        time: isNaN(timeValue) ? packetCountRef.current * 0.0005 : timeValue,
-        wind: parseFloat(values[idx(1)]) || 0,
-        pv: parseFloat(values[idx(2)]) || 0,
-        vbus: parseFloat(values[idx(3)]) || 240,
-        ibus: parseFloat(values[idx(4)]) || 0,
-        cl1: (parseInt(values[idx(5)]) || 0) as 0 | 1,
-        cl2: (parseInt(values[idx(6)]) || 0) as 0 | 1,
-        cl3: (parseInt(values[idx(7)]) || 0) as 0 | 1,
-        mainsRequest: parseFloat(values[idx(8)]) || 0,
-        ls1: (parseInt(values[idx(9)]) || 0) as 0 | 1,
-        ls2: (parseInt(values[idx(10)]) || 0) as 0 | 1,
-        ls3: (parseInt(values[idx(11)]) || 0) as 0 | 1,
-        bchg: (parseInt(values[idx(12)]) || 0) as 0 | 1,
-        bdis: (parseInt(values[idx(13)]) || 0) as 0 | 1,
-        soc: parseFloat(values[idx(14)]) || 0,
+        time: timeHours,
+        wind: v(1),
+        pv: v(2),
+        vbus: v(3) || 240,
+        ibus: v(4),
+        cl1: (Math.round(v(5)) || 0) as 0 | 1,
+        cl2: (Math.round(v(6)) || 0) as 0 | 1,
+        cl3: (Math.round(v(7)) || 0) as 0 | 1,
+        mainsRequest: v(8),
+        ls1: (Math.round(v(9)) || 0) as 0 | 1,
+        ls2: (Math.round(v(10)) || 0) as 0 | 1,
+        ls3: (Math.round(v(11)) || 0) as 0 | 1,
+        bchg: (Math.round(v(12)) || 0) as 0 | 1,
+        bdis: (Math.round(v(13)) || 0) as 0 | 1,
+        soc: v(14),
       };
     } catch {
       return null;
