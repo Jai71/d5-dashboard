@@ -167,10 +167,10 @@ function App() {
   }, [rawData]);
 
   return (
-    <div className="min-h-screen bg-bg-base text-text-primary font-sans">
+    <div className="min-h-screen bg-bg-base text-text-primary font-sans flex flex-col">
       {/* Restore banner */}
       {showRestore && (
-        <div className="flex items-center justify-between px-6 py-2 bg-bg-surface1 border-b border-border-default">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-2 bg-bg-surface1 border-b border-border-default">
           <span className="text-[13px] text-text-secondary">
             Previous session found.
           </span>
@@ -191,31 +191,35 @@ function App() {
         </div>
       )}
 
-      {/* Tab bar */}
-      <nav className="flex items-center border-b border-border-default overflow-x-auto">
+      {/* Tab bar — top on desktop, fixed bottom on mobile */}
+      <nav className="
+        fixed bottom-0 left-0 right-0 z-50 bg-bg-base border-t border-border-default
+        sm:relative sm:bottom-auto sm:z-auto sm:border-t-0 sm:border-b
+        flex items-center justify-around sm:justify-start overflow-x-auto
+      ">
         {TABS.map((tab, i) => (
           <button
             key={tab.label}
             onClick={() => setActiveTab(i)}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 text-[11px] sm:text-[12px] tracking-[0.08em] transition-colors shrink-0 ${
+            className={`flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-[12px] tracking-[0.08em] transition-colors shrink-0 ${
               activeTab === i
-                ? 'text-text-primary border-b-2 border-accent'
+                ? 'text-text-primary sm:border-b-2 sm:border-accent'
                 : 'text-text-tertiary hover:text-text-secondary'
             }`}
           >
-            <tab.icon size={16} />
-            {tab.label}
+            <tab.icon size={20} className="sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
-        <div className="flex-1" />
+        <div className="hidden sm:block flex-1" />
         <button
           onClick={() => setIsDark(d => !d)}
-          className="p-2 text-text-secondary hover:text-text-primary transition-colors"
+          className="hidden sm:block p-2 text-text-secondary hover:text-text-primary transition-colors"
           title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <div className="flex items-center gap-1.5 px-3 sm:px-5">
+        <div className="hidden sm:flex items-center gap-1.5 px-3 sm:px-5">
           <div className={`w-1.5 h-1.5 rounded-full ${
             serial.isConnected ? 'bg-battery animate-pulse' : 'bg-text-tertiary'
           }`} />
@@ -226,7 +230,7 @@ function App() {
       </nav>
 
       {/* Tab content */}
-      <main className="p-3 sm:p-6">
+      <main className="flex-1 p-3 sm:p-6 pb-20 sm:pb-6">
         {activeTab === 0 && (
           <LiveMonitor
             currentPoint={tab1CurrentPoint}

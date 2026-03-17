@@ -309,7 +309,7 @@ export default function AIInsights({
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] sm:h-[calc(100vh-140px)] relative">
+    <div className="flex flex-col h-[calc(100vh-130px)] sm:h-[calc(100vh-140px)] relative">
       {/* Empty State */}
       {isEmptyView && (
         <div

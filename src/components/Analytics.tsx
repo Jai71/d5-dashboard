@@ -82,7 +82,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
   return (
     <div className="space-y-6 pb-20">
       {/* Stacked Area Chart — Energy Sources */}
-      <div className="bg-bg-surface1 border border-border-default rounded-[14px] p-4">
+      <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-[14px] p-4">
         <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
           ENERGY SOURCES
         </div>
@@ -147,7 +147,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
       {/* Middle row: Donut + Safety panel */}
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_200px] gap-4">
         {/* Donut Chart */}
-        <div className="bg-bg-surface1 border border-border-default rounded-[14px] p-4">
+        <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-[14px] p-4">
           <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
             SOURCE MIX
           </div>
@@ -198,7 +198,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
 
         {/* Safety Check Panel */}
         <div
-          className={`bg-bg-surface1 border rounded-[14px] p-4 flex flex-col items-center justify-center text-center ${
+          className={`bg-bg-surface1 border rounded-2xl sm:rounded-[14px] p-4 flex flex-col items-center justify-center text-center ${
             violation ? 'border-error' : 'border-border-default'
           }`}
         >
@@ -224,7 +224,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
       </div>
 
       {/* Gantt Timeline */}
-      <div className="bg-bg-surface1 border border-border-default rounded-[14px] p-4">
+      <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-[14px] p-4">
         <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
           LOAD & BATTERY TIMELINE
         </div>
@@ -232,7 +232,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
       </div>
 
       {/* SoC Chart */}
-      <div className="bg-bg-surface1 border border-border-default rounded-[14px] p-4">
+      <div className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-[14px] p-4">
         <div className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary mb-3">
           BATTERY STATE OF CHARGE
         </div>
@@ -280,7 +280,7 @@ export default function Analytics({ chartData, metrics, settings, playback }: Pr
       </div>
 
       {/* Busbar Health (collapsible) */}
-      <details className="bg-bg-surface1 border border-border-default rounded-[14px] p-4">
+      <details className="bg-bg-surface1 border border-border-default rounded-2xl sm:rounded-[14px] p-4">
         <summary className="text-[10px] uppercase tracking-[0.08em] text-text-tertiary cursor-pointer">
           BUSBAR HEALTH
         </summary>
